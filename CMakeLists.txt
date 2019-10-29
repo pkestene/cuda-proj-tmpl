@@ -60,6 +60,8 @@ add_subdirectory(src)
 message("//===================================================")
 message("  ${PROJECT_NAME} build configuration:")
 message("//===================================================")
+message("  CUDA compiler ID      : ${CMAKE_CUDA_COMPILER_ID}")
+message("  CUDA compiler Version : ${CMAKE_CUDA_COMPILER_VERSION}")
 message("  C++ Compiler : ${CMAKE_CXX_COMPILER_ID} " 
   "${CMAKE_CXX_COMPILER_VERSION} " 
   "${CMAKE_CXX_COMPILER_WRAPPER}")
