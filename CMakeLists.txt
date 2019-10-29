@@ -26,7 +26,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #####################################################################
 enable_language(CUDA)
 
-find_package(CUDA REQUIRED)
+#find_package(CUDA REQUIRED)
 find_package(CUDALibs REQUIRED COMPONENTS CUBLAS )
 
 if(NOT DEFINED CMAKE_CUDA_STANDARD)
@@ -34,14 +34,15 @@ if(NOT DEFINED CMAKE_CUDA_STANDARD)
   set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 endif()
 
+# other third party libraries
+find_package(OpenMP)
+#find_package(OpenGL)
+#find_package(GLUT)
+
 # we also need extra stuff to make sure compile flags are correctly
 # passed to nvcc / host compiler
 include(protect_nvcc_flags)
 include(protect_pthread_flag)
-
-# other third party libraries
-#find_package(OpenGL)
-#find_package(GLUT)
 
 ##########################################################
 ##########################################################
@@ -62,13 +63,15 @@ message("  ${PROJECT_NAME} build configuration:")
 message("//===================================================")
 message("  CUDA compiler ID      : ${CMAKE_CUDA_COMPILER_ID}")
 message("  CUDA compiler Version : ${CMAKE_CUDA_COMPILER_VERSION}")
-message("  C++ Compiler : ${CMAKE_CXX_COMPILER_ID} " 
+message("  C++ Compiler : ${CMAKE_CXX_COMPILER_ID} "
   "${CMAKE_CXX_COMPILER_VERSION} " 
   "${CMAKE_CXX_COMPILER_WRAPPER}")
 message("    ${CMAKE_CXX_COMPILER}")
 message("  CUDA Compiler      : ${CMAKE_CUDA_COMPILER}")
 message("  CUDA Compiler exec : ${CUDA_NVCC_EXECUTABLE}")
 message("  CUDA Compile flags : ${CMAKE_CUDA_FLAGS}")
+message("")
+message("  OpenMP compile flags : ${OpenMP_CXX_FLAGS}")
 message("")
 #message(" Thrid party libraries")
 #message("  OpenGL found : ${OPENGL_FOUND}")

@@ -20,19 +20,23 @@
 #include <cublas.h>
 
 // =========================
+// OpenMP imports 
+// =========================
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+// =========================
 // our imports
 // =========================
 #include "my_cuda_utils.h"
 #include "SimpleTimer.h"
+#include "OpenMPTimer.h"
 #include "CudaTimer.h"
 
 // =========================
 // global variables and configuration section
 // =========================
-
-// problem size (vector length) N
-//static int N = 1234567;
-static int N = 1<<22;
 
 // number of repetitions of the timing loop
 // (CPU timers only have a ~ms resolution)
@@ -40,12 +44,25 @@ static int numTimingReps = 100;
 
 
 // =========================
-// kernel function (CPU)
+// kernel function (CPU) - serial
 // =========================
-void saxpy_serial(int n, float alpha, float *x, float *y)
+void saxpy_serial(int n, float alpha, const float *x, float *y)
 {
-  int i;
-  for (i=0; i<n; i++)
+  
+  for (size_t i=0; i<n; i++)
+    y[i] = alpha*x[i] + y[i];
+}
+
+// =========================
+// kernel function (CPU) - OpenMP
+// =========================
+void saxpy_openmp(int n, float alpha, 
+                  const float * x, float * y)
+{
+  
+  #pragma omp parallel for
+  #pragma ivdep
+  for (size_t i=0; i<n; i++)
     y[i] = alpha*x[i] + y[i];
 }
 
@@ -53,13 +70,13 @@ void saxpy_serial(int n, float alpha, float *x, float *y)
 // =========================
 // kernel function (CUDA device)
 // =========================
-__global__ void saxpy_cuda(int n, float alpha, float *x, float *y)
+__global__ void saxpy_cuda(int n, float alpha, const float *x, float *y)
 {
   // compute the global index in the vector from
   // the number of the current block, blockIdx,
   // the number of threads per block, blockDim,
   // and the number of the current thread within the block, threadIdx
-  int i = blockIdx.x * blockDim.x + threadIdx.x;
+  size_t i = blockIdx.x * blockDim.x + threadIdx.x;
 
   // except for special cases, the total number of threads in all blocks
   // adds up to more than the vector length n, so this conditional is
@@ -75,13 +92,29 @@ __global__ void saxpy_cuda(int n, float alpha, float *x, float *y)
 // =========================
 int main (int argc, char **argv)
 {
+
+  // problem size (vector length) N
+  //size_t N = 1234567;
+  size_t N = 1<<22;
+  //size_t N = 40000;
+
+  if (argc>1)
+    N = atoi(argv[1]);
+
+
   SimpleTimer cpuTimer;
+  OpenMPTimer ompTimer;
   CudaTimer   gpuTimer;
+
+#ifdef _OPENMP
+  printf("Using %d OpenMP threads\n",omp_get_num_threads());
+#else
+  printf("OpenMP not activated\n");
+#endif
 
   // =========================
   // (1) initialisations:
-  //     implemented in tools.c
-  //     '0' is the device to use, see lesson0
+  //     implemented in my_cuda_utils.c
   // =========================
   initCuda(0);
 
@@ -102,8 +135,8 @@ int main (int argc, char **argv)
   // =========================
   // (3) initialise data on the CPU
   // =========================
-  int i;
-  for (i=0; i<N; i++)
+//#pragma omp parallel for
+  for (size_t i=0; i<N; i++)
   {
     h_x[i] = 1.0f + i;
     h_y[i] = (float)(N-i+1);
@@ -119,7 +152,7 @@ int main (int argc, char **argv)
 
   
   // =========================
-  // (5) perform computation on host
+  // (5a) perform computation on host - SERIAL
   //     use our straight forward code
   //     and our utility functions to time everything,
   //     note that gettimeofday has ~ms resolution, so
@@ -127,13 +160,26 @@ int main (int argc, char **argv)
   //     timing noise
   // =========================
   float alpha = 2.0;
-  int iter;
   cpuTimer.start();
-  for (iter=0; iter<numTimingReps; iter++)
+  for (int iter=0; iter<numTimingReps; iter++)
     saxpy_serial(N, alpha, h_x, h_y);
   cpuTimer.stop();
   double elapsed = cpuTimer.elapsed();
-  printf("OUR CPU CODE: %8d elements, %10.6f ms per iteration, %6.3f GFLOP/s, %7.3f GB/s\n",
+  printf("CPU CODE (Serial): %8ld elements, %10.6f ms per iteration, %6.3f GFLOP/s, %7.3f GB/s\n",
+         N,
+         (elapsed*1000.0)/(double)numTimingReps,
+         2.0*N*numTimingReps / (elapsed*1e9),
+         3.0*N*sizeof(float)*numTimingReps / (elapsed*1e9) );
+
+  // =========================
+  // (5b) perform computation on host - OpenMP
+  // =========================
+  ompTimer.start();
+  for (int iter=0; iter<numTimingReps; iter++)
+    saxpy_openmp(N, alpha, h_x, h_y);
+  ompTimer.stop();
+  elapsed = ompTimer.elapsed();
+  printf("CPU CODE (OpenMP): %8ld elements, %10.6f ms per iteration, %6.3f GFLOP/s, %7.3f GB/s\n",
          N,
          (elapsed*1000.0)/(double)numTimingReps,
          2.0*N*numTimingReps / (elapsed*1e9),
@@ -164,7 +210,7 @@ int main (int argc, char **argv)
   saxpy_cuda<<<numBlocks, numThreadsPerBlock>>>(N, alpha, d_x, d_y);  
   gpuTimer.stop();
   time = gpuTimer.elapsed();
-  printf("OUR GPU CODE: %8d elements, %10.6f ms per iteration, %6.3f GFLOP/s, %7.3f GB/s\n",
+  printf("GPU CODE (CUDA)  : %8ld elements, %10.6f ms per iteration, %6.3f GFLOP/s, %7.3f GB/s\n",
          N,
          time*1000,
          2.0*N / (time*1e9),
@@ -187,7 +233,7 @@ int main (int argc, char **argv)
   cublasSaxpy(N, alpha, d_x, 1, d_y, 1);
   gpuTimer.stop();
   time = gpuTimer.elapsed();
-  printf("CUBLAS      : %8d elements, %10.6f ms per iteration, %6.3f GFLOP/s, %7.3f GB/s\n",
+  printf("GPU CODE (CUBLAS): %8ld elements, %10.6f ms per iteration, %6.3f GFLOP/s, %7.3f GB/s\n",
          N,
          time*1000,
          2.0*N / (time*1e9),
@@ -200,13 +246,13 @@ int main (int argc, char **argv)
   //      it has been executed 1000 times before
   // =========================
   int errorCount = 0;
-  for (i=0; i<N; i++)
+  for (size_t i=0; i<N; i++)
   {
     h_x[i] = 1.0f + i;
     h_y[i] = (float)(N-i+1);
   }
   saxpy_serial(N, alpha, h_x, h_y);
-  for (i=0; i<N; i++) 
+  for (size_t i=0; i<N; i++) 
   {
     if (abs(h_y[i]-h_z[i]) > 1e-6)
       errorCount = errorCount + 1;
