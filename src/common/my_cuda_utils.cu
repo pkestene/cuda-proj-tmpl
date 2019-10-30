@@ -7,14 +7,16 @@
 #include <cuda_runtime.h>
 #include <cublas.h>
 
-
-/////////////////////////////////////
-// initialises CUDA and directs all
-// computations to the given
-// CUDA device
-/////////////////////////////////////
+// ==================================
+// ==================================
+/* 
+ * initialises CUDA and directs all
+ * computations to the given
+ * CUDA device
+ */
 void initCuda(const int selectedDevice)
 {
+
   int deviceCount;
   cudaGetDeviceCount(&deviceCount);
   if (deviceCount == 0)
@@ -31,15 +33,15 @@ void initCuda(const int selectedDevice)
   checkErrors("initCuda");
 
   cublasInit();
-}
 
+} // initCuda
 
-
-/////////////////////////////////////
+// ==================================
 // error checking 
-/////////////////////////////////////
-void checkErrors(char *label)
+// ==================================
+void checkErrors(const char *label)
 {
+
   cudaDeviceSynchronize();
   cudaError_t err = cudaGetLastError();
   if (err != cudaSuccess)
@@ -47,4 +49,5 @@ void checkErrors(char *label)
     char *e = (char*) cudaGetErrorString(err);
     fprintf(stderr, "CUDA Error: %s (at %s)", e, label);
   }
-}
+
+} // checkErrors
