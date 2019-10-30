@@ -1,9 +1,7 @@
+add_subdirectory(common)
+
 add_executable(saxpy_cuda "")
-target_sources(saxpy_cuda PRIVATE 
-  saxpy.cu
-  my_cuda_utils.cu
-  SimpleTimer.cpp
-  OpenMPTimer.cpp)
+target_sources(saxpy_cuda PRIVATE saxpy.cu)
 
 # the following line shouldn't be necessary as target_link_library
 # with OpenMP::OpenMP_CXX should pass the correct flags for OpenMP
@@ -17,3 +15,4 @@ target_compile_options(saxpy_cuda PUBLIC
 
 target_link_libraries(saxpy_cuda PUBLIC CUDA::cublas)
 target_link_libraries(saxpy_cuda PUBLIC OpenMP::OpenMP_CXX)
+target_link_libraries(saxpy_cuda PUBLIC cuda::common)
