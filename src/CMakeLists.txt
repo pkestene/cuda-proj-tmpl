@@ -3,7 +3,7 @@ add_subdirectory(common)
 add_executable(saxpy_cuda "")
 target_sources(saxpy_cuda PRIVATE saxpy.cu)
 
-# the following line shouldn't be necessary as target_link_library
+# the following line shouldn't be necessary as target_link_libraries
 # with OpenMP::OpenMP_CXX should pass the correct flags for OpenMP
 # but apparently, this is KO when using nvcc :(
 # You can remove that if OpenMP is not required
