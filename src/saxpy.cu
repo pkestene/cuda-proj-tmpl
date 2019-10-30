@@ -107,7 +107,11 @@ int main (int argc, char **argv)
   CudaTimer   gpuTimer;
 
 #ifdef _OPENMP
-  printf("Using %d OpenMP threads\n",omp_get_num_threads());
+#pragma omp parallel
+  {
+#pragma omp single
+    printf("Using %d OpenMP threads\n",omp_get_num_threads());
+  }
 #else
   printf("OpenMP not activated\n");
 #endif
