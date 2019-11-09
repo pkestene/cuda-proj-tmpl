@@ -236,6 +236,9 @@ int main (int argc, char **argv)
   cublasSaxpy(handle, N, &alpha, d_x, 1, d_y, 1);
   gpuTimer.stop();
   time = gpuTimer.elapsed();
+
+  cublasDestroy(handle);
+
   printf("GPU CODE (CUBLAS): %8ld elements, %10.6f ms per iteration, %6.3f GFLOP/s, %7.3f GB/s\n",
          N,
          time*1000,
