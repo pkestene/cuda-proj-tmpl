@@ -17,7 +17,7 @@
 // CUDA imports 
 // =========================
 #include <cuda_runtime.h>
-#include <cublas.h>
+#include <cublas_v2.h>
 
 // =========================
 // OpenMP imports 
@@ -135,7 +135,7 @@ int main (int argc, char **argv)
   // =========================
   // (3) initialise data on the CPU
   // =========================
-//#pragma omp parallel for
+#pragma omp parallel for
   for (size_t i=0; i<N; i++)
   {
     h_x[i] = 1.0f + i;
@@ -228,9 +228,12 @@ int main (int argc, char **argv)
   // =========================
   // (9) perform computation on device, CUBLAS
   // =========================
+  cublasHandle_t handle;
+  cublasCreate(&handle);
+
   gpuTimer.reset();
   gpuTimer.start();
-  cublasSaxpy(N, alpha, d_x, 1, d_y, 1);
+  cublasSaxpy(handle, N, &alpha, d_x, 1, d_y, 1);
   gpuTimer.stop();
   time = gpuTimer.elapsed();
   printf("GPU CODE (CUBLAS): %8ld elements, %10.6f ms per iteration, %6.3f GFLOP/s, %7.3f GB/s\n",
