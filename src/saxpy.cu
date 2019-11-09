@@ -30,6 +30,7 @@
 // our imports
 // =========================
 #include "my_cuda_utils.h"
+#include "cuda_error.h"
 #include "SimpleTimer.h"
 #include "OpenMPTimer.h"
 #include "CudaTimer.h"
@@ -130,10 +131,9 @@ int main (int argc, char **argv)
   float *h_x = (float*)malloc(N*sizeof(float));
   float *h_y = (float*)malloc(N*sizeof(float));
   float *d_x;
-  cudaMalloc((void**)&d_x, N*sizeof(float));
+  CUDA_API_CHECK( cudaMalloc((void**)&d_x, N*sizeof(float)) );
   float *d_y;
-  cudaMalloc((void**)&d_y, N*sizeof(float));
-  checkErrors("memory allocation");
+  CUDA_API_CHECK( cudaMalloc((void**)&d_y, N*sizeof(float)) );
 
 
   // =========================
@@ -150,9 +150,8 @@ int main (int argc, char **argv)
   // =========================
   // (4) copy data to device
   // =========================
-  cudaMemcpy(d_x, h_x, N*sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(d_y, h_y, N*sizeof(float), cudaMemcpyHostToDevice);
-  checkErrors("copy data to device");
+  CUDA_API_CHECK( cudaMemcpy(d_x, h_x, N*sizeof(float), cudaMemcpyHostToDevice) );
+  CUDA_API_CHECK( cudaMemcpy(d_y, h_y, N*sizeof(float), cudaMemcpyHostToDevice) );
 
   
   // =========================
@@ -211,7 +210,8 @@ int main (int argc, char **argv)
   int numBlocks = (N+numThreadsPerBlock-1) / numThreadsPerBlock;
 
   gpuTimer.start();
-  saxpy_cuda<<<numBlocks, numThreadsPerBlock>>>(N, alpha, d_x, d_y);  
+  saxpy_cuda<<<numBlocks, numThreadsPerBlock>>>(N, alpha, d_x, d_y);
+  CUDA_KERNEL_CHECK("saxpy_cuda");
   gpuTimer.stop();
   time = gpuTimer.elapsed();
   printf("GPU CODE (CUDA)  : %8ld elements, %10.6f ms per iteration, %6.3f GFLOP/s, %7.3f GB/s\n",
@@ -225,9 +225,8 @@ int main (int argc, char **argv)
   // (8) read back result from device into temp vector
   // =========================
   float *h_z = (float*)malloc(N*sizeof(float));
-  cudaMemcpy(h_z, d_y, N*sizeof(float), cudaMemcpyDeviceToHost);
-  checkErrors("copy data from device");
-
+  CUDA_API_CHECK( cudaMemcpy(h_z, d_y, N*sizeof(float), cudaMemcpyDeviceToHost) );
+  
   
   // =========================
   // (9) perform computation on device, CUBLAS
@@ -273,7 +272,6 @@ int main (int argc, char **argv)
     printf("Result comparison passed.\n");
 
   
-
   // =========================
   // (11) clean up, free memory
   // =========================
@@ -283,5 +281,5 @@ int main (int argc, char **argv)
   cudaFree(d_x);
   cudaFree(d_y);
 
-  return 0;
+  return EXIT_SUCCESS;
 }
