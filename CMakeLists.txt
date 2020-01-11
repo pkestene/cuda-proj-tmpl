@@ -59,8 +59,15 @@ add_subdirectory(src)
 # Configuration summary
 #-------------------------------------------------------------------#
 message("//===================================================")
-message("  ${PROJECT_NAME} build configuration:")
+message("// ${PROJECT_NAME} build configuration:")
+message("// ${PROJECT_NAME} version : ${PROJECT_VERSION}")
 message("//===================================================")
+message("  CMake version          : ${CMAKE_VERSION}")
+if (NOT CMAKE_BUILD_TYPE)
+  message("  CMake build type       : NOT SET !")
+else()
+  message("  CMake build type       : ${CMAKE_BUILD_TYPE}")
+endif()
 message("  CUDA compiler ID      : ${CMAKE_CUDA_COMPILER_ID}")
 message("  CUDA compiler Version : ${CMAKE_CUDA_COMPILER_VERSION}")
 message("  C++ Compiler : ${CMAKE_CXX_COMPILER_ID} "
