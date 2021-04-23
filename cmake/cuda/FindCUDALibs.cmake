@@ -91,7 +91,8 @@ if (BLAS_FOUND)
 endif()
 
 # TODO: (nppi* nvblas)
-foreach (cuda_lib cufft cufftw curand cusolver cusparse nvgraph nvjpeg)
+# note: nvgraph is dropped in cuda toolkit 11.0
+foreach (cuda_lib cufft cufftw curand cusolver cusparse nvjpeg)
   # find the dynamic library
   find_and_add_cuda_import_lib(${cuda_lib})
   add_cuda_link_dependency(${cuda_lib} CUDA::cudart)
@@ -144,10 +145,10 @@ endforeach()
 
 # nvGRAPH depends on cuBLAS, cuRAND, cuSPARSE, and cuSOLVER.
 # NOTE: rely on link dependencies of cuSOLVER, this must happen after cusolver target.
-foreach (dep cusolver curand)
-  add_cuda_link_dependency(nvgraph CUDA::${dep})
-  add_cuda_link_dependency(nvgraph_static CUDA::${dep}_static)
-endforeach()
+# foreach (dep cusolver curand)
+#   add_cuda_link_dependency(nvgraph CUDA::${dep})
+#   add_cuda_link_dependency(nvgraph_static CUDA::${dep}_static)
+# endforeach()
 
 # NPP libraries and dependencies.  See: https://docs.nvidia.com/cuda/npp/index.html
 # TODO: document what nppc is (seems to be the underlying implementation for most of NPP?)
