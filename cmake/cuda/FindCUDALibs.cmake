@@ -91,7 +91,7 @@ if (BLAS_FOUND)
 endif()
 
 # TODO: (nppi* nvblas)
-# note: nvgraph is dropped in cuda toolkit 11.0
+# Note : nvgraph is not shipped in cuda toolkit any more, deprecated android# replaced by cuGraph (https://github.com/rapidsai/cugraph)
 foreach (cuda_lib cufft cufftw curand cusolver cusparse nvjpeg)
   # find the dynamic library
   find_and_add_cuda_import_lib(${cuda_lib})

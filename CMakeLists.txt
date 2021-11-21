@@ -1,4 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
+
+if(${CMAKE_VERSION} VERSION_LESS "3.18.0")
+    message("Using CMake version ${CMAKE_VERSION} with policy CMP0104 OLD")
+    cmake_policy(SET CMP0104 OLD)
+else()
+    message("Using CMake version ${CMAKE_VERSION} with policy CMP0104 NEW")
+    cmake_policy(SET CMP0104 NEW)
+endif()
+
 project(cuda-proj-tmpl LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -21,7 +30,7 @@ include(print_target_properties)
 #include(build_macro)
 
 # always export compile commands database
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)  
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 #####################################################################
 enable_language(CUDA)
