@@ -14,7 +14,8 @@ See https://github.com/CLIUtils/modern_cmake
 
 ## Requirements
 
-- cmake version >= 3.22 (when using nvc++/nvhpc compiler
+- cmake version >= 3.18 (when using nvcc)
+- cmake version >= 3.22 (when using nvc++/nvhpc compiler)
 - cuda toolkit
 
 ## How to build with nvcc ?
@@ -48,7 +49,9 @@ make
 # How to build with nvc++ (from nvhpc) ?
 
 ```bash
+# Warning, cmake 3.22.0 required
 export CUDAFLAGS="--expt-extended-lambda"
+export CXX=nvc++
 mkdir build
 cd build
 cmake -DCMAKE_CUDA_HOST_COMPILER=nvc++ -DCMAKE_CUDA_ARCHITECTURES="75" ..

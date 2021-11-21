@@ -1,16 +1,23 @@
 # cmake 3.22 is necessary to have FindCUDAToolkit.cmake
 # actually find cublas library when using nvc++ compiler (form nvhpc)
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.18)
 
+message("Using CMake version ${CMAKE_VERSION}")
 if(${CMAKE_VERSION} VERSION_LESS "3.18.0")
-    message("Using CMake version ${CMAKE_VERSION} with policy CMP0104 OLD")
+    message("Using cmake policy CMP0104 OLD")
     cmake_policy(SET CMP0104 OLD)
 else()
-    message("Using CMake version ${CMAKE_VERSION} with policy CMP0104 NEW")
+    message("Using cmake policy CMP0104 NEW")
     cmake_policy(SET CMP0104 NEW)
 endif()
 
 project(cuda-proj-tmpl LANGUAGES CXX C)
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
+  if(${CMAKE_VERSION} VERSION_LESS "3.22.0")
+    message(FATAL_ERROR "NVHPC requires cmake version >= 3.22.0")
+  endif()
+endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -41,8 +48,10 @@ enable_language(CUDA)
 # either when using nvcc from cuda toolkit or nvc++ from nvhpc
 # only in cmake 3.22.0
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.22.0" )
+  message("Using CUDAToolkit macros")
   find_package(CUDAToolkit REQUIRED)
 else()
+  message("Using CUDALibs macros")
   find_package(CUDALibs REQUIRED COMPONENTS CUBLAS)
 endif()
 
@@ -88,7 +97,7 @@ endif()
 message("  CUDA compiler ID      : ${CMAKE_CUDA_COMPILER_ID}")
 message("  CUDA compiler Version : ${CMAKE_CUDA_COMPILER_VERSION}")
 message("  C++ Compiler : ${CMAKE_CXX_COMPILER_ID} "
-  "${CMAKE_CXX_COMPILER_VERSION} " 
+  "${CMAKE_CXX_COMPILER_VERSION} "
   "${CMAKE_CXX_COMPILER_WRAPPER}")
 message("    ${CMAKE_CXX_COMPILER}")
 message("  CUDA Compiler      : ${CMAKE_CUDA_COMPILER}")
