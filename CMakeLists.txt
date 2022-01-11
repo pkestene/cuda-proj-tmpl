@@ -1,7 +1,13 @@
 # cmake 3.22 is necessary to have FindCUDAToolkit.cmake
-# actually find cublas library when using nvc++ compiler (form nvhpc)
+# actually find cublas library when using nvc++ compiler (from nvhpc
+# package)
 cmake_minimum_required(VERSION 3.18)
 
+#
+# check if we want to apply cmake policy CMP0104, i.e.
+# raise an error is CUDA_ARCHITECTURES is empty, when using
+# nvc++ compiler
+#
 message("Using CMake version ${CMAKE_VERSION}")
 if(${CMAKE_VERSION} VERSION_LESS "3.18.0")
     message("Using cmake policy CMP0104 OLD")
