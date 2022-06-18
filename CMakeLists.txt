@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.18)
 
 #
 # check if we want to apply cmake policy CMP0104, i.e.
-# raise an error is CUDA_ARCHITECTURES is empty, when using
+# raise an error if CUDA_ARCHITECTURES is empty, when using
 # nvc++ compiler
 #
 message("Using CMake version ${CMAKE_VERSION}")
