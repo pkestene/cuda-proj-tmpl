@@ -20,14 +20,14 @@ class OpenMPTimer
 public:
   /** default constructor, timing starts rightaway */
   OpenMPTimer();
-    
+
   OpenMPTimer(double t);
   OpenMPTimer(OpenMPTimer const& aTimer);
   virtual ~OpenMPTimer();
 
   /** start time measure */
   virtual void start();
-    
+
   /** stop time measure and add result to total_time */
   virtual void stop();
 

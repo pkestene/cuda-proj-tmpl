@@ -1,5 +1,5 @@
 /**
- * Compute saxpy 
+ * Compute saxpy
  * - on CPU : serial and OpenMP version
  * - on GPU : first using CUDA, then library CuBLAS
  *
@@ -14,13 +14,13 @@
 #include <stdlib.h>
 
 // =========================
-// CUDA imports 
+// CUDA imports
 // =========================
 #include <cuda_runtime.h>
 #include <cublas_v2.h>
 
 // =========================
-// OpenMP imports 
+// OpenMP imports
 // =========================
 #ifdef _OPENMP
 #include <omp.h>
@@ -49,7 +49,7 @@ static int numTimingReps = 100;
 // =========================
 void saxpy_serial(int n, float alpha, const float *x, float *y)
 {
-  
+
   for (size_t i=0; i<n; i++)
     y[i] = alpha*x[i] + y[i];
 }
@@ -57,10 +57,10 @@ void saxpy_serial(int n, float alpha, const float *x, float *y)
 // =========================
 // kernel function (CPU) - OpenMP
 // =========================
-void saxpy_openmp(int n, float alpha, 
+void saxpy_openmp(int n, float alpha,
                   const float * x, float * y)
 {
-  
+
   #pragma omp parallel for
   #pragma ivdep
   for (size_t i=0; i<n; i++)
@@ -123,7 +123,7 @@ int main (int argc, char **argv)
   // =========================
   initCuda(0);
 
-  
+
   // =========================
   // (2) allocate memory on host (main CPU memory) and device,
   //     h_ denotes data residing on the host, d_ on device
@@ -153,7 +153,7 @@ int main (int argc, char **argv)
   CUDA_API_CHECK( cudaMemcpy(d_x, h_x, N*sizeof(float), cudaMemcpyHostToDevice) );
   CUDA_API_CHECK( cudaMemcpy(d_y, h_y, N*sizeof(float), cudaMemcpyHostToDevice) );
 
-  
+
   // =========================
   // (5a) perform computation on host - SERIAL
   //     use our straight forward code
@@ -188,7 +188,7 @@ int main (int argc, char **argv)
          2.0*N*numTimingReps / (elapsed*1e9),
          3.0*N*sizeof(float)*numTimingReps / (elapsed*1e9) );
 
-  
+
   // =========================
   // (7) perform computation on device, our implementation
   //     use CUDA events to time the execution:
@@ -220,19 +220,19 @@ int main (int argc, char **argv)
          2.0*N / (time*1e9),
          3.0*N*sizeof(float) / (time*1e9) );
 
-  
+
   // =========================
   // (8) read back result from device into temp vector
   // =========================
   float *h_z = (float*)malloc(N*sizeof(float));
   CUDA_API_CHECK( cudaMemcpy(h_z, d_y, N*sizeof(float), cudaMemcpyDeviceToHost) );
-  
-  
+
+
   // =========================
   // (9) perform computation on device, CUBLAS
   // =========================
   cublasHandle_t handle;
-  cublasCreate(&handle);
+  auto status = cublasCreate(&handle);
 
   gpuTimer.reset();
   gpuTimer.start();
@@ -247,7 +247,7 @@ int main (int argc, char **argv)
          time*1000,
          2.0*N / (time*1e9),
          3.0*N*sizeof(float) / (time*1e9) );
-  
+
 
   // =========================
   // (10) perform result comparison
@@ -261,7 +261,7 @@ int main (int argc, char **argv)
     h_y[i] = (float)(N-i+1);
   }
   saxpy_serial(N, alpha, h_x, h_y);
-  for (size_t i=0; i<N; i++) 
+  for (size_t i=0; i<N; i++)
   {
     if (abs(h_y[i]-h_z[i]) > 1e-6)
       errorCount = errorCount + 1;
@@ -271,7 +271,7 @@ int main (int argc, char **argv)
   else
     printf("Result comparison passed.\n");
 
-  
+
   // =========================
   // (11) clean up, free memory
   // =========================

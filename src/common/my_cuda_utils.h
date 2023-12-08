@@ -9,17 +9,15 @@
 void initCuda(const int selectedDevice);
 
 /////////////////////////////////////
-// error checking 
+// error checking
 /////////////////////////////////////
 void checkErrors(const char *label);
 
 
 /////////////////////////////////////
-// CPU based timings 
+// CPU based timings
 /////////////////////////////////////
 void startTimer(void);
 double stopTimer(void);
 
-
 #endif
-

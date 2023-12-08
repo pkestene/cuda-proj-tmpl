@@ -9,7 +9,7 @@
 
 // ==================================
 // ==================================
-/* 
+/*
  * initialises CUDA and directs all
  * computations to the given
  * CUDA device
@@ -37,7 +37,7 @@ void initCuda(const int selectedDevice)
 } // initCuda
 
 // ==================================
-// error checking 
+// error checking
 // ==================================
 void checkErrors(const char *label)
 {

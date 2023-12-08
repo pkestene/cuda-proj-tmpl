@@ -1,7 +1,7 @@
 /**
  * \file OpenMPTimer.cpp
  * \brief a simpe Timer class implementation.
- * 
+ *
  * \author Pierre Kestener
  * \date 29 Oct 2010
  *
@@ -25,12 +25,12 @@ OpenMPTimer::OpenMPTimer() {
 
 // =======================================================
 // =======================================================
-OpenMPTimer::OpenMPTimer(double t) 
+OpenMPTimer::OpenMPTimer(double t)
 {
-    
+
   start_time = 0;
   total_time = t;
-    
+
 } // OpenMPTimer::OpenMPTimer
 
   // =======================================================
@@ -47,19 +47,19 @@ OpenMPTimer::~OpenMPTimer()
 
 // =======================================================
 // =======================================================
-void OpenMPTimer::start() 
+void OpenMPTimer::start()
 {
 
   start_time = omp_get_wtime();
-  
+
 } // OpenMPTimer::start
-  
+
 // =======================================================
 // =======================================================
 void OpenMPTimer::stop()
 {
   double now = omp_get_wtime();
-  
+
   total_time += (now-start_time);
 
 } // OpenMPTimer::stop

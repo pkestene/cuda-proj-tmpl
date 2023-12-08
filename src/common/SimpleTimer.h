@@ -23,14 +23,14 @@ class SimpleTimer
 public:
   /** default constructor, timing starts rightaway */
   SimpleTimer();
-    
+
   SimpleTimer(double t);
   SimpleTimer(SimpleTimer const& aTimer);
   virtual ~SimpleTimer();
 
   /** start time measure */
   virtual void start();
-    
+
   /** stop time measure and add result to total_time */
   virtual void stop();
 
