@@ -63,8 +63,8 @@ endif()
 
 if(NOT DEFINED CMAKE_CUDA_STANDARD)
   set(CMAKE_CUDA_STANDARD 11)
-  set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 endif()
+set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
 # other third party libraries
 find_package(OpenMP)
@@ -106,6 +106,7 @@ message("  C++ Compiler : ${CMAKE_CXX_COMPILER_ID} "
   "${CMAKE_CXX_COMPILER_VERSION} "
   "${CMAKE_CXX_COMPILER_WRAPPER}")
 message("    ${CMAKE_CXX_COMPILER}")
+message("  CUDA CXX STANDARD  : ${CMAKE_CUDA_STANDARD}")
 message("  CUDA Compiler      : ${CMAKE_CUDA_COMPILER}")
 message("  CUDA Compiler exec : ${CUDA_NVCC_EXECUTABLE}")
 message("  CUDA Compile flags : ${CMAKE_CUDA_FLAGS}")
