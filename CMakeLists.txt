@@ -25,7 +25,9 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "NVHPC")
   endif()
 endif()
 
-set(CMAKE_CXX_STANDARD 11)
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 11)
+endif()
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # custom cmake macros location
@@ -106,6 +108,7 @@ message("  C++ Compiler : ${CMAKE_CXX_COMPILER_ID} "
   "${CMAKE_CXX_COMPILER_VERSION} "
   "${CMAKE_CXX_COMPILER_WRAPPER}")
 message("    ${CMAKE_CXX_COMPILER}")
+message("  CXX      STANDARD  : ${CMAKE_CXX_STANDARD}")
 message("  CUDA CXX STANDARD  : ${CMAKE_CUDA_STANDARD}")
 message("  CUDA Compiler      : ${CMAKE_CUDA_COMPILER}")
 message("  CUDA Compiler exec : ${CUDA_NVCC_EXECUTABLE}")
