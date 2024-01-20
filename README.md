@@ -32,7 +32,7 @@ make
 ./src/saxpy_cuda
 ```
 
-If you use cmake version >= 3.18, here is a slightly updated version using CMAKE_CUDA_ARCHITECTURE
+If you use cmake version >= 3.18, here is a slightly updated version using `CMAKE_CUDA_ARCHITECTURE`
 to pass information about actual GPU hardware target architecture:
 
 ```bash
